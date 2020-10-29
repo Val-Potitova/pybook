@@ -10,7 +10,27 @@ def encrypt_vigenere(plaintext: str, keyword: str) -> str:
     'LXFOPVEFRNHR'
     """
     ciphertext = ""
-    # PUT YOUR CODE HERE
+    s=[0]*26
+    for i in range(26):
+        s[i] = chr(ord('A') + i)
+    m=len(plaintext)//len(keyword)
+    if len(plaintext)%len(keyword)!=0:
+        m +=1
+    n=0
+    for i in range(m):
+        for j in range(len(keyword)):
+            for k in range(26):
+                if keyword[j].upper()==s[k]:
+                    if ord(plaintext[n].upper())+k > ord('Z'):
+                        ciphertext += chr(ord(plaintext[n])+k-26)
+                        break
+                    else:
+                        ciphertext += chr(ord(plaintext[n]) + k)
+                        break
+            if n==len(plaintext)-1:
+                break
+            n += 1
+
     return ciphertext
 
 
@@ -26,5 +46,25 @@ def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
     'ATTACKATDAWN'
     """
     plaintext = ""
-    # PUT YOUR CODE HERE
+    s = [0] * 26
+    for i in range(26):
+        s[i] = chr(ord('A') + i)
+    m = len(ciphertext) // len(keyword)
+    if len(ciphertext) % len(keyword) != 0:
+        m += 1
+    n = 0
+    for i in range(m):
+        for j in range(len(keyword)):
+            for k in range(26):
+                if keyword[j].upper() == s[k]:
+                    if ord(ciphertext[n].upper()) - k < ord('A'):
+                        plaintext += chr(ord(ciphertext[n]) - k + 26)
+                        break
+                    else:
+                        plaintext += chr(ord(ciphertext[n]) - k)
+                        break
+            if n == len(ciphertext) - 1:
+                break
+            n += 1
+
     return plaintext
