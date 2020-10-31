@@ -19,14 +19,17 @@ def encrypt_vigenere(plaintext: str, keyword: str) -> str:
     n=0
     for i in range(m):
         for j in range(len(keyword)):
-            for k in range(26):
-                if keyword[j].upper()==s[k]:
-                    if ord(plaintext[n].upper())+k > ord('Z'):
-                        ciphertext += chr(ord(plaintext[n])+k-26)
-                        break
-                    else:
-                        ciphertext += chr(ord(plaintext[n]) + k)
-                        break
+            if plaintext[n].isalpha():
+                for k in range(26):
+                    if keyword[j].upper()==s[k]:
+                        if ord(plaintext[n].upper())+k > ord('Z'):
+                            ciphertext += chr(ord(plaintext[n])+k-26)
+                            break
+                        else:
+                            ciphertext += chr(ord(plaintext[n]) + k)
+                            break
+            else:
+                ciphertext += plaintext[n]
             if n==len(plaintext)-1:
                 break
             n += 1
@@ -55,14 +58,17 @@ def decrypt_vigenere(ciphertext: str, keyword: str) -> str:
     n = 0
     for i in range(m):
         for j in range(len(keyword)):
-            for k in range(26):
-                if keyword[j].upper() == s[k]:
-                    if ord(ciphertext[n].upper()) - k < ord('A'):
-                        plaintext += chr(ord(ciphertext[n]) - k + 26)
-                        break
-                    else:
-                        plaintext += chr(ord(ciphertext[n]) - k)
-                        break
+            if ciphertext[n].isalpha():
+                for k in range(26):
+                    if keyword[j].upper() == s[k]:
+                        if ord(ciphertext[n].upper()) - k < ord('A'):
+                            plaintext += chr(ord(ciphertext[n]) - k + 26)
+                            break
+                        else:
+                            plaintext += chr(ord(ciphertext[n]) - k)
+                            break
+            else:
+                plaintext += ciphertext[n]
             if n == len(ciphertext) - 1:
                 break
             n += 1
