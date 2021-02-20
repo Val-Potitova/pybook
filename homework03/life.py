@@ -18,19 +18,14 @@ class GameOfLife:
         randomize: bool = True,
         max_generations: tp.Optional[float] = float("inf"),
     ) -> None:
-        
         # Размер клеточного поля
         self.rows, self.cols = size
-        
         # Предыдущее поколение клеток
         self.prev_generation = self.create_grid()
-        
         # Текущее поколение клеток
         self.curr_generation = self.prev_generation
-        
         # Максимальное число поколений
         self.max_generations = max_generations
-        
         # Текущее число поколений
         self.n_generation = 1
 
@@ -45,8 +40,7 @@ class GameOfLife:
 
 
     def get_neighbours(self, cell: Cell) -> Cells:
-        #координаты клетки
-       
+
         x, y = cell
         neighbour = []
         for row in [-1, 0, 1]:
@@ -79,6 +73,7 @@ class GameOfLife:
         """
         Выполнить один шаг игры.
         """
+        
         self.prev_generation = self.curr_generation
         self.curr_generation = self.get_next_generation()
         self.n_generation += 1
@@ -104,6 +99,7 @@ class GameOfLife:
         """
         Прочитать состояние клеток из указанного файла.
         """
+        
         grid = []
         file = filename.open(mode="r")
         for line in file.readlines():
@@ -117,6 +113,7 @@ class GameOfLife:
         """
         Сохранить текущее состояние клеток в указанный файл.
         """
+        
         file = filename.open(mode="w")
         for row in self.curr_generation:
             file.write("".join([str(char) for char in row]))
