@@ -1,11 +1,14 @@
 import pathlib
 import random
+from random import randint
 import typing as tp
-import copy
+
+import pygame
+from pygame.locals import *
 
 Cell = tp.Tuple[int, int]
-CellsArray = tp.List[int]
-Grid = tp.List[CellsArray]
+Cells = tp.List[int]
+Grid = tp.List[Cells]
 
 
 class GameOfLife:
@@ -15,113 +18,106 @@ class GameOfLife:
         randomize: bool = True,
         max_generations: tp.Optional[float] = float("inf"),
     ) -> None:
+        
         # Размер клеточного поля
         self.rows, self.cols = size
-
+        
         # Предыдущее поколение клеток
         self.prev_generation = self.create_grid()
-
+        
         # Текущее поколение клеток
-        self.curr_generation = self.create_grid(randomize=randomize)
-
+        self.curr_generation = self.prev_generation
+        
         # Максимальное число поколений
         self.max_generations = max_generations
-
+        
         # Текущее число поколений
-        self.generations = 1
+        self.n_generation = 1
 
-    def create_grid(self, randomize=False):
-        grid = []
-
-        for row in range(self.rows):
-            grid.append([])
-            for col in range(self.cols):
-                if randomize:
-                    is_alive = random.choice([0, 1])
-                else:
-                    is_alive = 0
-
-                grid[row].append(is_alive)
-
+    def create_grid(self, randomize=True, grid = []) -> Grid:
+        
+        if randomize:
+            grid = [[random.randint(0, 1) for _ in range(self.cols)] for _ in range(self.rows)]
+        else:
+            grid = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
+            
         return grid
 
-    def get_neighbours(self, cell: Cell) -> CellsArray:
-        cell_row, cell_col = cell
-        neighbours = []
 
-        for row in range(cell_row - 1, cell_row + 2):
-            for col in range(cell_col - 1, cell_col + 2):
-                if row < 0 or row >= self.rows or col < 0 or col >= self.cols:
-                    continue
+    def get_neighbours(self, cell: Cell) -> Cells:
+        #координаты клетки
+       
+        x, y = cell
+        neighbour = []
+        for row in [-1, 0, 1]:
+            for col in [-1, 0, 1]:
+                if(
+                        (row, col) != (0, 0) and
+                        0 <= x + row < self.rows and
+                        0 <= y + col < self.cols
+                ):
+                    neighbour.append(self.curr_generation[x + row][y + col])
 
-                if row == cell_row and col == cell_col:
-                    continue
-
-                is_alive = self.curr_generation[row][col]
-                neighbours.append(is_alive)
-
-        return neighbours
+        return neighbour
 
     def get_next_generation(self) -> Grid:
-        new_grid = copy.deepcopy(self.curr_generation)
-
-        for row in range(self.rows):
-            for col in range(self.cols):
-                neighbours = self.get_neighbours((row, col))
-                is_alive = self.curr_generation[row][col]
-
-                if sum(neighbours) in [2, 3] and is_alive == 1:
-                    pass
-
-                elif sum(neighbours) == 3:
-                    new_grid[row][col] = 1
-
+        
+        self.next_generation = self.create_grid(randomize=False)
+        for x in range(self.rows):
+            for y in range(self.cols):
+                yep_neighbour = self.get_neighbours((x, y)).count(1)
+                if self.curr_generation[x][y] == 1 and yep_neighbour in [2, 3]:
+                    self.next_generation[x][y] = 1
+                elif self.curr_generation[x][y] == 0 and yep_neighbour == 3:
+                    self.next_generation[x][y] = 1
                 else:
-                    new_grid[row][col] = 0
-
-        return new_grid
+                    self.next_generation[x][y] = 0
+                    
+        return self.next_generation
 
     def step(self) -> None:
-        if self.generations > self.max_generations:
-            return
-
-        self.prev_generation = copy.deepcopy(self.curr_generation)
+        """
+        Выполнить один шаг игры.
+        """
+        self.prev_generation = self.curr_generation
         self.curr_generation = self.get_next_generation()
-
-        self.generations += 1
+        self.n_generation += 1
 
     @property
-    def is_max_generations_exceeded(self) -> bool:
-        if self.generations >= self.max_generations:
-            return True
-        else:
-            return False
+    def is_max_generations_exceed(self) -> bool:
+        """
+        Не превысило ли текущее число поколений максимально допустимое.
+        """
+        
+        return self.n_generation == self.max_generations
 
     @property
     def is_changing(self) -> bool:
-        was_changed = False
-
-        for row in range(self.rows):
-            for col in range(self.cols):
-                if self.prev_generation[row][col] != self.curr_generation[row][col]:
-                    was_changed = True
-                    break
-
-        return was_changed
+        """
+        Изменилось ли состояние клеток с предыдущего шага.
+        """
+        
+        return self.prev_generation != self.curr_generation
 
     @staticmethod
-    def from_file(filename: pathlib.Path) -> 'GameOfLife':
-        file = filename.read_text().split('\n')
-        file.remove('')
-
+    def from_file(filename: pathlib.Path) -> "GameOfLife":
+        """
+        Прочитать состояние клеток из указанного файла.
+        """
         grid = []
-        for line in file:
-            grid.append(list(map(int, line)))
-
-        game = GameOfLife((len(grid), len(grid[0])), False)
-        game.curr_generation = grid
-
-        return game
+        file = filename.open(mode="r")
+        for line in file.readlines():
+            line = line.replace("\n", "")
+            row = []
+            for char in line:
+                row.append(int(char))
+            grid.append(row)
 
     def save(self, filename: pathlib.Path) -> None:
-        pass
+        """
+        Сохранить текущее состояние клеток в указанный файл.
+        """
+        file = filename.open(mode="w")
+        for row in self.curr_generation:
+            file.write("".join([str(char) for char in row]))
+            file.write("\n")
