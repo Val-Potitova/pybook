@@ -5,6 +5,8 @@ from ui import UI
 import time
 from time import sleep
 
+import argparse
+
 
 class Console(UI):
 
@@ -35,6 +37,19 @@ class Console(UI):
         curses.endwin()
         
 if __name__ == "__main__":
-    game = GameOfLife(size=(5, 5), randomize=True)
-    console = Console(game)
-    console.run()        
+    game=GameOfLife(size=(5, 5), randomize=True)
+    console=Console(game)
+    console.run()    
+    
+parser = argparse.ArgumentParser(description="data")
+    parser.add_argument('-width', '--width', type=int , help='width of data')
+    parser.add_argument('-height', '--height', type=int , help='height of data')
+    parser.add_argument('-cellsize', '--cellsize', type=int , help='cellsize of data')
+    parser.add_argument()
+    
+if __name__ == "__main__":
+    r=int(args.width//args.cellsize)
+    c=int(args.height//args.cellsize)
+    life=GameOfLife((r, c), False)
+    gui=GUI(life, args.cellsize, 10)
+    gui.run()
