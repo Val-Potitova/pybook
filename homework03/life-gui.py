@@ -82,5 +82,27 @@ def main():
     app = GUI(game)
     app.run()
 
-if __name__ == '__main__':
-    main()
+
+if __name__ == "__main__":
+    ''''''
+    parser = argparse.ArgumentParser(description="data", prog="gof-gui.py")
+    parser.add_argument('--width', type=int, default=640,
+                        help='width of data')
+    parser.add_argument('--height', type=int, default=480,
+                        help='height of data')
+    parser.add_argument('--cell_size', type=int, default=20,
+                        help='cell size of data')
+    args = parser.parse_args()
+    w = args.width > 0
+    h = args.height > 0
+    c = args.cell_size > 0
+    if w and h and c and args.width // args.cell_size > 0 and args.height // args.cell_size > 0:
+        gui = GUI(GameOfLife((args.width // args.cell_size, args.height // args.cell_size)), cell_size=args.cell_size)
+        gui.run()
+    else:
+        if not w:
+            print('Incorrect value of width')
+        if not h:
+            print('Incorrect value of height')
+        if not c:
+            print('Incorrect value of cell size')
