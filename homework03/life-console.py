@@ -39,8 +39,8 @@ class Console(UI):
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="data", prog="gof-console.py")
-    parser.add_argument('--rows', type=int, default=24, help='height of data')
-    parser.add_argument('--cols', type=int, default=80, help='height of data')
+    parser.add_argument('--rows', type=int, default=24, help='rows of data')
+    parser.add_argument('--cols', type=int, default=80, help='cols of data')
     parser.add_argument('--max_generations', type=int, default=50, help='max generations of data')
     args = parser.parse_args()
     r = args.rows > 0
