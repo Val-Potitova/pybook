@@ -36,15 +36,24 @@ class Console(UI):
             time.sleep(1)
         curses.endwin()
         
-parser = argparse.ArgumentParser(description="data")
-    parser.add_argument('-width', '--width', type=int , help='width of data')
-    parser.add_argument('-height', '--height', type=int , help='height of data')
-    parser.add_argument('-cellsize', '--cellsize', type=int , help='cellsize of data')
-    parser.add_argument()
     
 if __name__ == "__main__":
-    r=int(args.width//args.cellsize)
-    c=int(args.height//args.cellsize)
-    life=GameOfLife((r, c), False)
-    gui=GUI(life, args.cellsize, 10)
-    gui.run()
+    parser = argparse.ArgumentParser(description="data", prog="gof-console.py")
+    parser.add_argument('--width', type=int, default=24, help='height of data')
+    parser.add_argument('--height', type=int, default=80, help='height of data')
+    parser.add_argument('--max_generations', type=int, default=50, help='max generations of data')
+    args = parser.parse_args()
+    r = args.width > 0
+    c = args.height > 0
+    m = args.max_generations > 0
+    if r and c and m:
+        console = Console(GameOfLife((args.rows, args.cols), max_generations=args.max_generations))
+        curses.update_lines_cols()
+        console.run()
+    else:
+        if not r:
+            print('Incorrect value of width')
+        if not c:
+            print('Incorrect value of height')
+        if not m:
+            print('Incorrect value of max generations')
