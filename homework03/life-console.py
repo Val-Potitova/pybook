@@ -39,12 +39,12 @@ class Console(UI):
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="data", prog="gof-console.py")
-    parser.add_argument('--width', type=int, default=24, help='height of data')
-    parser.add_argument('--height', type=int, default=80, help='height of data')
+    parser.add_argument('--rows', type=int, default=24, help='height of data')
+    parser.add_argument('--cols', type=int, default=80, help='height of data')
     parser.add_argument('--max_generations', type=int, default=50, help='max generations of data')
     args = parser.parse_args()
-    r = args.width > 0
-    c = args.height > 0
+    r = args.rows > 0
+    c = args.cols > 0
     m = args.max_generations > 0
     if r and c and m:
         console = Console(GameOfLife((args.rows, args.cols), max_generations=args.max_generations))
@@ -52,8 +52,8 @@ if __name__ == "__main__":
         console.run()
     else:
         if not r:
-            print('Incorrect value of width')
+            print('Incorrect value of rows')
         if not c:
-            print('Incorrect value of height')
+            print('Incorrect value of cols')
         if not m:
             print('Incorrect value of max generations')
